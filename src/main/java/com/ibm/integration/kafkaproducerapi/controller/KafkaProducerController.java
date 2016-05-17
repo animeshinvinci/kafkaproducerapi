@@ -1,7 +1,5 @@
 package com.ibm.integration.kafkaproducerapi.controller;
 
-import java.util.UUID;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ibm.integration.kafkaproducerapi.beans.APIRequest;
 import com.ibm.integration.kafkaproducerapi.beans.APIResponse;
+import com.ibm.integration.kafkaproducerapi.beans.ChannelMessage;
 import com.ibm.integration.kafkaproducerapi.dao.KafkaMessageProducer;
 
 @RestController
@@ -32,27 +30,22 @@ public class KafkaProducerController extends APIController
 	@Value("${version}")
 	private String version;
 	
-	private static String generateUUID()
-	{
-		return UUID.randomUUID().toString();
-	}
-
 	@RequestMapping(method = RequestMethod.PUT, value = "/{topic}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody ResponseEntity<APIResponse> createMessage(
 			@PathVariable("topic") String topic,
-			@RequestBody(required = true) APIRequest request)
+			@RequestBody(required = true) ChannelMessage message)
 	{
 		APIResponse result = null;
 		ResponseEntity<APIResponse> response;
 		try
 		{
-			request.getMessage().setUuid(generateUUID());
 			ObjectMapper om = new ObjectMapper();
-			String payload = om.writeValueAsString(request.getMessage());
+			String payload = om.writeValueAsString(message);
 			logger.info("Received request to publish Kafka Message: " + payload);
-			kafkaProducer.publishMessage(topic, request.getMessage().getUuid(), payload);
+			kafkaProducer.publishMessage(topic, message.getUuid(), payload);
 			result = new APIResponse();
 			result.setStatus(APIResponse.STATUS_SUCCESS);
+			result.setResponse(payload);
 			result.setVersion(version);
 			response = ResponseEntity.ok(result);
 		}

@@ -1,10 +1,15 @@
 package com.ibm.integration.kafkaproducerapi.beans;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 public class ChannelMessage
-{
+{	
+	public static String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+	
+	private SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+
 	//private ObjectId _id;
 	private String uuid;
 	private String title;
@@ -80,12 +85,19 @@ public class ChannelMessage
 	{
 		this.channel = channel;
 	}
-	public Date getDate()
+	public String getDate()
 	{
-		return date;
+		return sdf.format(date);
 	}
-	public void setDate(Date date)
+	public void setDate(String date)
 	{
-		this.date = date;
+		try
+		{
+			this.date = sdf.parse(date);
+		}
+		catch (Exception e)
+		{
+			this.date = new Date();
+		}
 	}
 }

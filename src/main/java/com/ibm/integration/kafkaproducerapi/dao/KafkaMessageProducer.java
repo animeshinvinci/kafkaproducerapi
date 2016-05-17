@@ -33,13 +33,16 @@ public class KafkaMessageProducer
 			logger.info("Creating Kafka Producer... " + "Load Interval = " + loadInterval);
 			producer = new KafkaProducer<>(propsDao.getKafkaProperties());
 			lastLoadTime = Calendar.getInstance().getTimeInMillis();
+			logger.info("Creating Kafka Producer complete...");
 		}
 		return producer;
 	}
 
 	public void publishMessage(String topic, String key, String value) throws Exception
 	{
+		logger.info("Sending Kafka Message on topic: " + topic + " with key: " + key + " message: "+ value);
 		getProducer().send(new ProducerRecord<String, String>(topic, key, value));
+		logger.info("Sending Kafka Message on topic: " + topic + " with key: " + key + " complete...");
 	}
 	
 }
